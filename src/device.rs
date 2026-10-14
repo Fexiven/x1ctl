@@ -58,8 +58,6 @@ pub struct State {
     /// MCU/chip type (`09/01`), = `chipId` in Creative's metadata.
     pub mcu_type: Option<u8>,
     pub max_payload: Option<u16>,
-    /// Whether the X1 reports support for the General factory reset (`9B/02`).
-    pub factory_reset_supported: Option<bool>,
     pub usb: Option<serial::UsbInfo>,
     /// Increments whenever a full EQ dump finishes (second dump frame, `more = 0`).
     #[serde(skip)]
@@ -541,34 +539,11 @@ impl Device {
         )
     }
 
-    /// `9B/02`. A NAK means "not supported"; any data reply or a success ack means supported.
-    pub fn factory_reset_supported(&self) -> Result<bool> {
-        let op = proto::OP_FACTORY_RESET;
-        match self.request(&proto::req_factory_reset_support(), move |fr| {
-            fr.op() == Some(op) || matches!(fr.ack(), Some((o, _)) if o == op)
-        }) {
-            Ok(fr) => {
-                log::info!("factory reset support reply: {fr}");
-                Ok(match fr.ack() {
-                    Some((_, s)) => s == 0,
-                    // data reply: Operation(02) then a flag/mask byte if present
-                    None => fr.payload().get(1).is_none_or(|&b| b != 0),
-                })
-            }
-            Err(Error::Nak(_, _)) => Ok(false),
-            Err(e) => Err(e),
-        }
-    }
-
-    /// Creative App's "Reset to factory defaults" for the X1 (FactoryReset type General).
-    /// Resets device settings (EQ in both slots, Super X-Fi state, levels) to defaults.
-    /// The X1 may reboot and re-enumerate afterwards, ending this session.
+    /// Creative App's "Reset to factory defaults": `5A 9B 01 01` (FactoryReset, type General),
+    /// exactly what Creative's CTCDC.dll sends for `CTCDCCMD_FactoryReset`. Like Creative App,
+    /// no support query first — the X1 rejects the `9B 02` query but that says nothing about
+    /// the reset itself. The X1 may reboot and re-enumerate afterwards, ending this session.
     pub fn factory_reset(&self) -> Result<()> {
-        if !self.factory_reset_supported()? {
-            return Err(Error::Refused(
-                "this X1 does not report factory-reset support".into(),
-            ));
-        }
         let op = proto::OP_FACTORY_RESET;
         match self.request(&proto::req_factory_reset(), move |fr| {
             fr.op() == Some(op) || matches!(fr.ack(), Some((o, _)) if o == op)
@@ -579,6 +554,9 @@ impl Device {
             }
             // the device may reset before answering
             Err(Error::Timeout(_)) | Err(Error::Disconnected) => Ok(()),
+            Err(Error::Nak(_, 0x81)) => Err(Error::Refused(
+                "the X1 rejected the factory reset (not supported)".into(),
+            )),
             Err(e) => Err(e),
         }
     }
@@ -688,9 +666,6 @@ impl Device {
         }
         let usb = serial::usb_info(&self.port_path());
         self.set_state(|s| s.usb = usb);
-        if let Some(v) = log_err("factory reset support", self.factory_reset_supported()) {
-            self.set_state(|s| s.factory_reset_supported = Some(v));
-        }
         if let Some(hp) = log_err("headphone profile", self.headphone_profile()) {
             self.set_state(|s| s.headphone_profile = Some(hp));
         }

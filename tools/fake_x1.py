@@ -126,7 +126,7 @@ def handle_frame(op, p):
     elif op == 0x6D: out(frame(0x6D, b"\x01\x00"))
     elif op == 0x09 and p == b"\x01\x00": pass  # handled below (kept for clarity)
     elif op == 0x9B:
-        if p == b"\x02": out(ack(0x9B))
+        if p == b"\x02": out(ack(0x9B, 0x81))   # the real X1 rejects the support query
         elif p == b"\x01":
             out(ack(0x9B))
             sxfi = False

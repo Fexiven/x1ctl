@@ -253,9 +253,9 @@ pub fn check_outgoing(op: u8, p: &[u8]) -> Result<()> {
         OP_OPERATION_MODE => matches!(p, [0x01]),
         // SuperXFi: QueryCapabilities(00), GetActiveHeadphoneInformation(06)
         OP_SUPERXFI => matches!(p, [0x00] | [0x06]),
-        // FactoryReset: support query (02) and the General/software reset (01) that Creative
-        // App uses for the X1. The Full reset (03) is never sent.
-        OP_FACTORY_RESET => matches!(p, [0x02] | [0x01]),
+        // FactoryReset: only the General reset (01) Creative App sends for the X1
+        // (CTCDC.dll: 5A 9B 01 <type>, type 1). Full reset (03) is never sent.
+        OP_FACTORY_RESET => matches!(p, [0x01]),
         _ => false,
     };
     if ok {
@@ -409,12 +409,6 @@ pub fn req_fw_version() -> Frame {
     Frame::Cmd {
         op: OP_DEVICE_INFO,
         payload: vec![0x01, 0x00],
-    }
-}
-pub fn req_factory_reset_support() -> Frame {
-    Frame::Cmd {
-        op: OP_FACTORY_RESET,
-        payload: vec![0x02],
     }
 }
 pub fn req_factory_reset() -> Frame {
@@ -896,7 +890,6 @@ mod tests {
             req_sxfi_caps(),
             req_sxfi_hp_info(),
             req_fw_version(),
-            req_factory_reset_support(),
             req_factory_reset(),
         ] {
             let Frame::Cmd { op, payload } = &f else {
@@ -921,8 +914,8 @@ mod tests {
     #[test]
     fn factory_reset_allowlist() {
         assert_eq!(req_factory_reset().to_bytes(), h("5A 9B 01 01"));
-        assert_eq!(req_factory_reset_support().to_bytes(), h("5A 9B 01 02"));
         assert!(check_outgoing(OP_FACTORY_RESET, &[0x03]).is_err()); // full reset never
+        assert!(check_outgoing(OP_FACTORY_RESET, &[0x02]).is_err()); // no support query either
         let f = &parse_all(&h("5A 09 08 01 00 60 E5 32 20 2D 04"))[0];
         assert_eq!(
             parse_fw_version(f.payload()).unwrap(),

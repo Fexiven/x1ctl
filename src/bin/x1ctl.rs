@@ -581,10 +581,6 @@ fn run(cli: Cli) -> R<()> {
         }
         Cmd::Info => print_info(&cur()?),
         Cmd::FactoryReset { yes } => {
-            let s = cur()?;
-            if s["factory_reset_supported"].as_bool() == Some(false) {
-                return Err("this X1 does not report factory-reset support".into());
-            }
             if !yes {
                 return Err("this resets the X1's settings (EQ in both Super X-Fi slots, Super X-Fi, levels) \
                             to factory defaults. Re-run with --yes to do it."
@@ -686,14 +682,7 @@ fn print_info(s: &Value) {
             None => "?".into(),
         },
     );
-    row(
-        "Factory reset",
-        match s["factory_reset_supported"].as_bool() {
-            Some(true) => "supported (x1ctl factory-reset --yes)".into(),
-            Some(false) => "not reported by the device".into(),
-            None => "?".into(),
-        },
-    );
+    row("Factory reset", "x1ctl factory-reset --yes".into());
 }
 
 fn monitor(be: Backend) -> R<()> {

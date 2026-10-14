@@ -131,11 +131,12 @@ writes it with `5A 39 03 00 1A 01` (bit 26); the device re-enumerates. Linux doe
   profile installed the X1 answers `06` + 64 zero bytes [confirmed].
 * `5A 6F 02 05 xx` (unsolicited): **Creative App ignores op 5** — no handler exists.
 
-### `9B` FactoryReset [Creative; support on the X1 unconfirmed]
-Ops: `01` SWFactoryReset, `02` GetFactoryResetSupport, `03` FullFactoryReset. For CDC devices
-Creative App's Device settings → Reset calls `CTCDCCMD_FactoryReset` with type **General (1)**,
-i.e. `5A 9B 01 01`. x1ctl queries `5A 9B 01 02` first and only enables the reset if the X1
-doesn't NAK it; `03` (Full) is never sent.
+### `9B` FactoryReset [Creative; CTCDC.dll]
+Ops: `01` SWFactoryReset, `02` GetFactoryResetSupport, `03` FullFactoryReset. Creative App's
+Device settings → Reset calls `CTCDCCMD_FactoryReset` (type General = 1), which Creative's
+`CTCDC.dll` sends as **`5A 9B 01 01`** — directly, without a support query, then waits up to
+3 s for the reply. The X1 answers the support query `9B 02` with `81 not supported`
+[confirmed], so that query must not be used to gate the reset. `03` (Full) is never sent.
 
 ### `6D` DeviceOperationMode
 `5A 6D 01 01` → `01 00` = Normal. Set would switch to Debug/Production/Recovery: **never**.

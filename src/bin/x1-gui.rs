@@ -819,16 +819,10 @@ fn device_info(ui: &mut egui::Ui, st: &State, confirm_reset: &mut bool) {
         });
     ui.add_space(8.0);
     ui.horizontal(|ui| {
-        let supported = st.factory_reset_supported == Some(true);
-        let b = ui.add_enabled(supported, egui::Button::new("Factory reset…"));
-        if b.clicked() {
+        if ui.button("Factory reset…").clicked() {
             *confirm_reset = true;
         }
-        let note = match st.factory_reset_supported {
-            Some(true) => "Resets EQ (both Super X-Fi slots), Super X-Fi and levels on the device.",
-            Some(false) => "This X1 doesn't report factory-reset support.",
-            None => "",
-        };
+        let note = "Same as Creative App's reset: EQ (both Super X-Fi slots), Super X-Fi and levels go back to defaults.";
         ui.label(RichText::new(note).weak().small());
     });
 }

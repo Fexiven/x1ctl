@@ -162,7 +162,11 @@ impl Port {
     /// cdc_acm then returns EOF (0 bytes) from read() forever instead of an error, so this
     /// has to be checked explicitly. Also true if the device node is gone.
     pub fn hung_up(&self) -> bool {
-        let mut pfd = libc::pollfd { fd: self.f.as_raw_fd(), events: libc::POLLIN, revents: 0 };
+        let mut pfd = libc::pollfd {
+            fd: self.f.as_raw_fd(),
+            events: libc::POLLIN,
+            revents: 0,
+        };
         let r = unsafe { libc::poll(&mut pfd, 1, 0) };
         if r < 0 {
             return true;
