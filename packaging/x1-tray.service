@@ -1,0 +1,12 @@
+[Unit]
+Description=Sound Blaster X1 tray icon
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/x1-gui --tray
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target

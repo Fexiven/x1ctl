@@ -1,0 +1,6 @@
+# Creative Sound Blaster X1 (041e:3286) control channel (CDC ACM)
+# - give the logged-in user access (uaccess)
+# - keep ModemManager from probing it with AT commands (breaks the unlock handshake)
+# - stable symlink /dev/sound-blaster-x1
+# - start the x1d user service when the device appears
+SUBSYSTEM=="tty", ATTRS{idVendor}=="041e", ATTRS{idProduct}=="3286", TAG+="uaccess", TAG+="systemd", ENV{ID_MM_DEVICE_IGNORE}="1", SYMLINK+="sound-blaster-x1", ENV{SYSTEMD_USER_WANTS}+="x1d.service"

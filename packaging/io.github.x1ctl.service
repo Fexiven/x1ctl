@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=io.github.x1ctl
+Exec=/usr/bin/x1d
+SystemdService=x1d.service

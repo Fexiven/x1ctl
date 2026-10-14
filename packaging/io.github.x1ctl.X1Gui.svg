@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E9BD7"/>
+      <stop offset="1" stop-color="#0E4F8A"/>
+    </linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D9EEF9"/>
+    </linearGradient>
+  </defs>
+  <!-- tile -->
+  <rect x="12" y="12" width="232" height="232" rx="52" fill="url(#bg)"/>
+  <!-- spatial rings: sound placed around the listener -->
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round">
+    <path d="M 52 150 A 80 80 0 0 1 52 106" stroke-width="7" opacity=".35"/>
+    <path d="M 204 106 A 80 80 0 0 1 204 150" stroke-width="7" opacity=".35"/>
+    <path d="M 34 162 A 100 100 0 0 1 34 94" stroke-width="6" opacity=".18"/>
+    <path d="M 222 94 A 100 100 0 0 1 222 162" stroke-width="6" opacity=".18"/>
+  </g>
+  <!-- headband -->
+  <path d="M 78 150 V 128 A 50 50 0 0 1 178 128 V 150" fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round"/>
+  <!-- ear cups -->
+  <rect x="62" y="136" width="34" height="58" rx="15" fill="url(#cup)"/>
+  <rect x="160" y="136" width="34" height="58" rx="15" fill="url(#cup)"/>
+  <!-- small EQ bars between the cups -->
+  <g fill="#FFFFFF">
+    <rect x="110" y="168" width="8" height="22" rx="4" opacity=".9"/>
+    <rect x="124" y="156" width="8" height="34" rx="4"/>
+    <rect x="138" y="174" width="8" height="16" rx="4" opacity=".9"/>
+  </g>
+</svg>

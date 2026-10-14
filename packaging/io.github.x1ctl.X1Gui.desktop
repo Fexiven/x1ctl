@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=X1 Control
+GenericName=Sound Blaster X1 settings
+Comment=Super X-Fi, equalizer and headphone level for the Creative Sound Blaster X1
+Exec=x1-gui
+Icon=io.github.x1ctl.X1Gui
+Terminal=false
+Categories=AudioVideo;Audio;Settings;HardwareSettings;
+Keywords=Creative;Sound Blaster;X1;Super X-Fi;SXFI;equalizer;EQ;
+StartupWMClass=io.github.x1ctl.X1Gui

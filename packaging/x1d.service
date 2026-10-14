@@ -1,0 +1,13 @@
+[Unit]
+Description=Sound Blaster X1 control daemon (D-Bus io.github.x1ctl)
+After=dbus.socket
+
+[Service]
+Type=dbus
+BusName=io.github.x1ctl
+ExecStart=/usr/bin/x1d
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
